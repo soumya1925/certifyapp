@@ -202,3 +202,61 @@ BREVO_API_KEY=your_brevo_api_key_here
 BREVO_SENDER_EMAIL=your_verified_email@gmail.com
 ```
 
+**package.json**
+- Ensure all dependencies are installed
+- Make sure this is present to start the application :
+
+ ```
+"start": "node src/index.js",
+ "dev": "nodemon src/index.js",
+ ```
+**App start command**
+- run the app , by npm start/ npm run dev
+- you must see something like this in the terminal
+
+ ```
+> certify-app@1.0.0 dev
+> nodemon src/index.js
+
+[nodemon] 3.1.11
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,cjs,json
+[nodemon] starting `node src/index.js`
+[dotenv@17.2.3] injecting env (2) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+ Email Service Initialized - Using Brevo
+Server running on http://localhost:3000
+ ```
+
+- test the link in the postman if runs successfully on local 
+- on postman create a post request with url http://localhost:3000/api/generate-certificate
+- attach a json body with it like
+
+ ```
+{
+  "name": "Your name",
+  "email": "yourmail@gmail.com",
+  "gstNumber": "29ABCDE1234F1Z5",
+  "businessName": "Deployment",
+  "businessAddress": "Bangalore, Karnataka, India"
+}
+ ```
+
+**Sucessful response**
+ ```
+{
+    "message": "Certificate generated successfully",
+    "pdfSize": 17597,
+    "jpgSize": 70229
+}
+ ```
+**Error response**
+ ```
+{
+    "message": "Certificate generation failed",
+    "error": "Connection timeout"
+}
+
+ ```
+
+
