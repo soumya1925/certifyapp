@@ -120,7 +120,7 @@ curl -X POST https://taxcertificate.onrender.com/api/generate-certificate \
 
 Brevo (formerly SendinBlue) provides the email delivery infrastructure that allows your certificate application to send emails with PDF attachments. Without Brevo, your app can generate certificates but   cannot   deliver them to users.
 
-**Issue with nodemailer and Puppeteer**
+**Issue with nodemailer and Puppeteer an alternative to using Brevo**
 - EMAIL SENDING FAILED:  SMTP Connection Timeouts
 - SMTP needs persistent connections
 - Render blocks outgoing SMTP ports (587, 465)
@@ -158,7 +158,24 @@ const response = await fetch('https://api.brevo.com/v3/smtp/email', {
 ```
 
 ### 📥 Clone the Repository
-
+**Quick Installation**
 ```bash
 git clone https://github.com/soumya1925/certifyapp.git
 cd certifyapp/certify-app
+```
+**Install Dependencies**
+```
+npm install express                      (Express.js is used to create the RESTful API and handle HTTP requests and routes.)
+npm install dotenv                       (Loads environment variables from a .env file into process.env.)
+npm install html-pdf                     (Generates professional PDF certificates from HTML templates.)
+npm install canvas                       (Creates JPG preview images of the generated tax certificates.)
+npm install @getbrevo/brevo              (Integrates Brevo (SendinBlue) to send certificate emails with attachments.)
+npm install --save-dev nodemon           (Automatically restarts the server during development when code changes.)
+```
+**or install all at once**
+```
+npm install express dotenv html-pdf canvas @getbrevo/brevo
+npm install --save-dev nodemon
+```
+
+
