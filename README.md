@@ -1,4 +1,4 @@
-# Tax Certificate Generator
+# Certificate Generator
 
 A professional GST/Tax Certificate Generation API that creates PDF certificates, generates preview images, and sends them via email. Built with Node.js and Express, and deployed on Render.
 
