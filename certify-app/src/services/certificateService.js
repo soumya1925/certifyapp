@@ -1,4 +1,5 @@
 const pdf = require('html-pdf');
+const { createCanvas, loadImage, registerFont } = require('canvas');
 const fs = require("fs");
 const path = require("path");
 
@@ -7,16 +8,14 @@ exports.generateCertificate = async (data) => {
   
   console.log('📄 Loading template from:', templatePath);
   
-  // Check if template exists
   if (!fs.existsSync(templatePath)) {
-    console.error('❌ Template not found at:', templatePath);
     throw new Error('Certificate template not found');
   }
   
   let html = fs.readFileSync(templatePath, "utf8");
   console.log('✅ Template loaded successfully');
 
-  // Replace template variables with actual data
+  // Replace template variables
   const replacements = {
     name: data.name || '',
     businessName: data.businessName || '',
@@ -24,86 +23,209 @@ exports.generateCertificate = async (data) => {
     businessAddress: data.businessAddress || ''
   };
 
-  console.log('🔄 Replacing template variables:');
   Object.entries(replacements).forEach(([key, value]) => {
-    const placeholder = new RegExp(`{{${key}}}`, 'g');
-    const beforeCount = (html.match(placeholder) || []).length;
-    html = html.replace(placeholder, value);
-    const afterCount = (html.match(placeholder) || []).length;
-    
-    console.log(`  • {{${key}}}: "${value.substring(0, 30)}${value.length > 30 ? '...' : ''}"`);
-    console.log(`    (${beforeCount} → ${afterCount} occurrences)`);
+    html = html.replace(new RegExp(`{{${key}}}`, 'g'), value);
   });
 
-  // Verify all placeholders are replaced
-  const remainingPlaceholders = html.match(/\{\{.*?\}\}/g);
-  if (remainingPlaceholders) {
-    console.log('⚠️ Warning: Some placeholders not replaced:', remainingPlaceholders);
-  }
-
-  console.log('🚀 Starting PDF generation...');
+  console.log('🚀 Starting certificate generation...');
   
   try {
-    // Generate PDF using html-pdf
+    // 1. Generate PDF using html-pdf
+    console.log('🖨️ Generating PDF...');
     const pdfBuffer = await new Promise((resolve, reject) => {
       const options = {
         format: 'A4',
-        orientation: 'portrait',
-        border: {
-          top: '0.5in',
-          right: '0.5in',
-          bottom: '0.5in',
-          left: '0.5in'
-        },
-        type: 'pdf',
-        quality: '100',
-        timeout: 30000, // 30 second timeout
-        // PhantomJS options
-        phantomArgs: ['--ignore-ssl-errors=yes', '--ssl-protocol=any'],
-        // Render delay to ensure CSS loads
-        renderDelay: 500,
-        // Base path for relative resources
-        base: 'file://' + path.dirname(templatePath) + '/'
+        border: '0.5in',
+        timeout: 30000
       };
 
-      console.log('🖨️ Creating PDF...');
       pdf.create(html, options).toBuffer((err, buffer) => {
         if (err) {
           console.error('❌ PDF creation failed:', err.message);
-          if (err.message.includes('phantomjs')) {
-            console.error('PhantomJS error - ensure it can execute on the system');
-          }
           reject(err);
         } else {
-          const fileSizeKB = Math.round(buffer.length / 1024);
-          console.log(`✅ PDF created successfully: ${fileSizeKB} KB`);
-          
-          // Optional: Save PDF for debugging
-          if (process.env.NODE_ENV === 'development') {
-            const debugPath = path.join(__dirname, '../../debug_certificate.pdf');
-            fs.writeFileSync(debugPath, buffer);
-            console.log(`📁 Debug PDF saved to: ${debugPath}`);
-          }
-          
+          console.log(`✅ PDF created: ${Math.round(buffer.length / 1024)} KB`);
           resolve(buffer);
         }
       });
     });
 
-    // Create a simple JPG placeholder (text representation)
-    const jpgText = `
-      CERTIFICATE OF REGISTRATION
-      
-      Certificate Holder: ${data.name || ''}
-      Business Name: ${data.businessName || ''}
-      GST Number: ${data.gstNumber || ''}
-      Business Address: ${data.businessAddress || ''}
-      
-      Generated: ${new Date().toLocaleString()}
-      This is a text representation of the certificate.
-    `;
+    // 2. Generate JPG using canvas
+    console.log('📸 Creating JPG with canvas...');
+    let jpgBuffer;
     
-    const jpgBuffer = Buffer.from(jpgText);
+    try {
+      // Create canvas (800x600 pixels for preview)
+      const canvas = createCanvas(800, 600);
+      const ctx = canvas.getContext('2d');
+      
+      // Set background color (white)
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      // Add gradient background
+      const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      gradient.addColorStop(0, '#f8f9fa');
+      gradient.addColorStop(1, '#e9ecef');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(20, 20, canvas.width - 40, canvas.height - 40);
+      
+      // Add border
+      ctx.strokeStyle = '#2c3e50';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+      
+      // Add inner border
+      ctx.strokeStyle = '#3498db';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+      
+      // Add title
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = 'bold 32px "Arial"';
+      ctx.textAlign = 'center';
+      ctx.fillText('CERTIFICATE OF REGISTRATION', canvas.width / 2, 80);
+      
+      // Add subtitle
+      ctx.fillStyle = '#3498db';
+      ctx.font = 'italic 20px "Arial"';
+      ctx.fillText('GST Registration Certificate', canvas.width / 2, 115);
+      
+      // Add decorative line
+      ctx.strokeStyle = '#e74c3c';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2 - 100, 130);
+      ctx.lineTo(canvas.width / 2 + 100, 130);
+      ctx.stroke();
+      
+      // Add certificate content
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = 'bold 18px "Arial"';
+      ctx.textAlign = 'left';
+      
+      let yPosition = 180;
+      
+      // Function to add field
+      const addField = (label, value, isImportant = false) => {
+        // Label
+        ctx.fillStyle = '#34495e';
+        ctx.font = 'bold 16px "Arial"';
+        ctx.fillText(`${label}:`, 50, yPosition);
+        
+        // Value
+        ctx.fillStyle = isImportant ? '#2c3e50' : '#2c3e50';
+        ctx.font = isImportant ? 'bold 18px "Arial"' : '16px "Arial"';
+        
+        // Handle long text
+        let lines = [];
+        const maxWidth = 650;
+        const words = value.split(' ');
+        let currentLine = '';
+        
+        for (const word of words) {
+          const testLine = currentLine + word + ' ';
+          const metrics = ctx.measureText(testLine);
+          
+          if (metrics.width > maxWidth && currentLine.length > 0) {
+            lines.push(currentLine);
+            currentLine = word + ' ';
+          } else {
+            currentLine = testLine;
+          }
+        }
+        
+        if (currentLine) {
+          lines.push(currentLine);
+        }
+        
+        // Draw each line
+        lines.forEach((line, index) => {
+          ctx.fillText(line, 200, yPosition + (index * 25));
+        });
+        
+        yPosition += (lines.length * 25) + 10;
+      };
+      
+      // Add fields
+      addField('Certificate Holder', data.name || 'Not Provided', true);
+      addField('Business Name', data.businessName || 'Not Provided');
+      addField('GST Number', data.gstNumber || 'Not Provided');
+      addField('Business Address', data.businessAddress || 'Not Provided');
+      
+      // Add "This certifies that" text
+      yPosition += 20;
+      ctx.fillStyle = '#7f8c8d';
+      ctx.font = 'italic 16px "Arial"';
+      ctx.textAlign = 'center';
+      ctx.fillText('This certifies registration under the GST Act', canvas.width / 2, yPosition);
+      
+      // Add signature area
+      yPosition += 60;
+      ctx.strokeStyle = '#2c3e50';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width - 250, yPosition);
+      ctx.lineTo(canvas.width - 50, yPosition);
+      ctx.stroke();
+      
+      ctx.fillStyle = '#2c3e50';
+      ctx.font = 'bold 14px "Arial"';
+      ctx.textAlign = 'right';
+      ctx.fillText('Authorized Signatory', canvas.width - 50, yPosition + 20);
+      
+      ctx.fillStyle = '#7f8c8d';
+      ctx.font = '12px "Arial"';
+      ctx.fillText(`Date: ${new Date().toLocaleDateString()}`, canvas.width - 50, yPosition + 40);
+      
+      // Add certificate ID
+      ctx.fillStyle = '#95a5a6';
+      ctx.font = '10px "Arial"';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Certificate ID: CERT-${Date.now().toString().slice(-8)}`, canvas.width / 2, canvas.height - 20);
+      
+      // Convert canvas to JPEG buffer
+      jpgBuffer = canvas.toBuffer('image/jpeg', {
+        quality: 0.9,
+        chromaSubsampling: false
+      });
+      
+      console.log(`✅ JPG created with canvas: ${Math.round(jpgBuffer.length / 1024)} KB`);
+      
+    } catch (jpgError) {
+      console.error('❌ Canvas JPG generation failed:', jpgError.message);
+      console.log('🔄 Creating ASCII art fallback...');
+      
+      // Fallback to ASCII art
+      const asciiCertificate = `
+╔══════════════════════════════════════════════════════╗
+║                CERTIFICATE PREVIEW                   ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║   ┌──────────────────────────────────────────────┐   ║
+║   │           CERTIFICATE OF REGISTRATION        │   ║
+║   │              GST Registration                │   ║
+║   │                                              │   ║
+║   │  📋 Certificate Holder:                      │   ║
+║   │     ${(data.name || '').padEnd(40, ' ')}│   ║
+║   │                                              │   ║
+║   │  🏢 Business Name:                           │   ║
+║   │     ${(data.businessName || '').padEnd(40, ' ')}│   ║
+║   │                                              │   ║
+║   │  🔢 GST Number:                              │   ║
+║   │     ${(data.gstNumber || '').padEnd(40, ' ')}│   ║
+║   │                                              │   ║
+║   │  📍 Business Address:                        │   ║
+║   │     ${(data.businessAddress || '').substring(0, 40).padEnd(40, ' ')}│   ║
+║   │                                              │   ║
+║   │  📅 Generated: ${new Date().toLocaleDateString().padEnd(30, ' ')}│   ║
+║   └──────────────────────────────────────────────┘   ║
+║                                                      ║
+╚══════════════════════════════════════════════════════╝
+      `;
+      
+      jpgBuffer = Buffer.from(asciiCertificate);
+    }
 
     console.log('🎉 Certificate generation complete!');
     return { 
@@ -112,89 +234,34 @@ exports.generateCertificate = async (data) => {
       metadata: {
         name: data.name,
         gstNumber: data.gstNumber,
-        businessName: data.businessName,
-        generatedAt: new Date().toISOString(),
-        pdfSize: pdfBuffer.length,
-        jpgSize: jpgBuffer.length
+        generatedAt: new Date().toISOString()
       }
     };
     
   } catch (error) {
-    console.error('❌ Certificate generation error:', error.message);
+    console.error('❌ Error:', error.message);
     
-    // Provide detailed error info
-    console.log('\n🔍 Debug information:');
-    console.log('1. Template path:', templatePath);
-    console.log('2. Template exists:', fs.existsSync(templatePath));
-    console.log('3. Template size:', html.length, 'characters');
-    console.log('4. Current directory:', process.cwd());
-    console.log('5. Node version:', process.version);
-    
-    // Try alternative PDF generation method
-    console.log('\n🔄 Attempting alternative PDF generation...');
+    // Simple fallback
     try {
-      // Create a very basic HTML as fallback
-      const fallbackHTML = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <style>
-                body { font-family: Arial; padding: 40px; }
-                h1 { color: #333; text-align: center; }
-                .certificate { border: 2px solid #000; padding: 30px; }
-                .field { margin: 15px 0; }
-                .label { font-weight: bold; }
-                .value { margin-left: 20px; }
-            </style>
-        </head>
-        <body>
-            <div class="certificate">
-                <h1>CERTIFICATE OF REGISTRATION</h1>
-                <div class="field">
-                    <span class="label">Certificate Holder:</span>
-                    <span class="value">${data.name || ''}</span>
-                </div>
-                <div class="field">
-                    <span class="label">Business Name:</span>
-                    <span class="value">${data.businessName || ''}</span>
-                </div>
-                <div class="field">
-                    <span class="label">GST Number:</span>
-                    <span class="value">${data.gstNumber || ''}</span>
-                </div>
-                <div class="field">
-                    <span class="label">Business Address:</span>
-                    <span class="value">${data.businessAddress || ''}</span>
-                </div>
-                <div style="margin-top: 40px; text-align: right;">
-                    <p>Date: ${new Date().toLocaleDateString()}</p>
-                </div>
-            </div>
-        </body>
-        </html>
-      `;
-      
       const pdfBuffer = await new Promise((resolve, reject) => {
-        pdf.create(fallbackHTML, { 
-          format: 'A4', 
-          border: '0.5in',
-          timeout: 10000 
-        })
-        .toBuffer((err, buffer) => {
+        pdf.create(`
+          <html><body style="padding:40px;">
+            <h1>CERTIFICATE</h1>
+            <p>Name: ${data.name}</p>
+            <p>Business: ${data.businessName}</p>
+            <p>GST: ${data.gstNumber}</p>
+            <p>Address: ${data.businessAddress}</p>
+          </body></html>
+        `, { format: 'A4' }).toBuffer((err, buffer) => {
           if (err) reject(err);
-          else {
-            console.log('✅ Fallback PDF generated:', buffer.length, 'bytes');
-            resolve(buffer);
-          }
+          else resolve(buffer);
         });
       });
       
-      const jpgBuffer = Buffer.from('Certificate JPG - Fallback version');
+      const jpgBuffer = Buffer.from('Certificate Preview');
       return { pdfBuffer, jpgBuffer };
       
     } catch (fallbackError) {
-      console.error('❌ Fallback also failed:', fallbackError.message);
       throw new Error(`Certificate generation failed: ${error.message}`);
     }
   }

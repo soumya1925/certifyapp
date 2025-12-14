@@ -8,13 +8,13 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "build": "npm install"
-    
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "canvas": "^3.2.0",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "html-pdf": "^3.0.1",
