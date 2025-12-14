@@ -1,16 +1,16 @@
 const Brevo = require('@getbrevo/brevo');
 
-console.log("📧 Email Service Initialized - Using Brevo");
+console.log(" Email Service Initialized - Using Brevo");
 
 /**
  * Send certificate email using Brevo
  */
 const sendCertificateEmail = async (toEmail, pdfBuffer, jpgBuffer) => {
-  console.log(`📨 Sending to: ${toEmail}`);
+  console.log(` Sending to: ${toEmail}`);
   console.log(`📎 PDF size: ${Math.round(pdfBuffer.length / 1024)}KB`);
 
   try {
-    console.log("✉️ Attempting Brevo send...");
+    console.log("Attempting Brevo send...");
     
     // METHOD 1: Direct API call (Most reliable)
     return await sendViaDirectAPI(toEmail, pdfBuffer, jpgBuffer);
@@ -32,7 +32,7 @@ const sendCertificateEmail = async (toEmail, pdfBuffer, jpgBuffer) => {
  * METHOD 1: Direct HTTP API call (most reliable)
  */
 async function sendViaDirectAPI(toEmail, pdfBuffer, jpgBuffer) {
-  console.log("📡 Using direct HTTP API...");
+  console.log(" Using direct HTTP API...");
   
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) {
@@ -63,7 +63,7 @@ async function sendViaDirectAPI(toEmail, pdfBuffer, jpgBuffer) {
 <body>
     <div class="container">
         <div class="header">
-            <h1 style="margin: 0;">📜 Certificate Ready!</h1>
+            <h1 style="margin: 0;"> Certificate Ready!</h1>
             <p style="margin: 10px 0 0 0; opacity: 0.9;">GST Registration Certificate</p>
         </div>
         <div class="content">
@@ -132,8 +132,8 @@ Certificate System`,
     throw new Error(`Brevo API error: ${JSON.stringify(data)}`);
   }
 
-  console.log("✅ Email sent successfully via Brevo API!");
-  console.log("📫 Message ID:", data.messageId);
+  console.log("Email sent successfully via Brevo API!");
+  console.log(" Message ID:", data.messageId);
   
   return {
     success: true,
@@ -148,7 +148,7 @@ Certificate System`,
  * METHOD 2: Using Brevo SDK (Alternative)
  */
 async function sendViaBrevoSDK(toEmail, pdfBuffer, jpgBuffer) {
-  console.log("📦 Using Brevo SDK...");
+  console.log(" Using Brevo SDK...");
   
   // Initialize Brevo client
   const apiInstance = new Brevo.TransactionalEmailsApi();
@@ -176,7 +176,7 @@ async function sendViaBrevoSDK(toEmail, pdfBuffer, jpgBuffer) {
   
   const data = await apiInstance.sendTransacEmail(sendSmtpEmail);
   
-  console.log("✅ Email sent via Brevo SDK!");
+  console.log(" Email sent via Brevo SDK!");
   return {
     success: true,
     messageId: data.messageId,
@@ -193,15 +193,15 @@ const testEmailConnection = async () => {
     
     const apiKey = process.env.BREVO_API_KEY;
     if (!apiKey) {
-      console.error("❌ BREVO_API_KEY not set");
+      console.error(" BREVO_API_KEY not set");
       return false;
     }
     
-    console.log("✅ API Key configured");
+    console.log(" API Key configured");
     return true;
     
   } catch (error) {
-    console.error("❌ Test failed:", error.message);
+    console.error(" Test failed:", error.message);
     return false;
   }
 };

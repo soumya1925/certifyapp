@@ -14,7 +14,7 @@ router.post("/generate-certificate", async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    // 1️⃣ Generate certificate (CRITICAL path)
+    // 1️ Generate certificate 
     const { pdfBuffer, jpgBuffer } = await generateCertificate({
       name,
       gstNumber,
@@ -22,20 +22,20 @@ router.post("/generate-certificate", async (req, res) => {
       businessAddress
     });
 
-    // 2️⃣ Respond immediately (avoid Render timeout)
+    //  Respond immediately (avoid Render timeout)
     res.status(200).json({
       message: "Certificate generated successfully",
       pdfSize: pdfBuffer.length,
       jpgSize: jpgBuffer.length
     });
 
-    // 3️⃣ Send email AFTER response (non-blocking)
+    //  Sending email AFTER response (non-blocking)
     sendCertificateEmail(email, pdfBuffer, jpgBuffer)
       .then(() => {
-        console.log("📧 Certificate email sent to:", email);
+        console.log(" Certificate email sent to:", email);
       })
       .catch((err) => {
-        console.error("📧 Email sending failed:", err.message);
+        console.error(" Email sending failed:", err.message);
       });
 
   } catch (error) {

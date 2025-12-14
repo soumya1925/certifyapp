@@ -6,16 +6,16 @@ const path = require("path");
 exports.generateCertificate = async (data) => {
   const templatePath = path.join(__dirname, "../templates/certificate.html");
   
-  console.log('📄 Loading template from:', templatePath);
+  console.log(' Loading template from:', templatePath);
   
   if (!fs.existsSync(templatePath)) {
     throw new Error('Certificate template not found');
   }
   
   let html = fs.readFileSync(templatePath, "utf8");
-  console.log('✅ Template loaded successfully');
+  console.log(' Template loaded successfully');
 
-  // Replace template variables
+  // Replacing template variables
   const replacements = {
     name: data.name || '',
     businessName: data.businessName || '',
@@ -27,11 +27,11 @@ exports.generateCertificate = async (data) => {
     html = html.replace(new RegExp(`{{${key}}}`, 'g'), value);
   });
 
-  console.log('🚀 Starting certificate generation...');
+  console.log(' Starting certificate generation...');
   
   try {
-    // 1. Generate PDF using html-pdf
-    console.log('🖨️ Generating PDF...');
+    // 1. Generating PDF using html-pdf
+    console.log(' Generating PDF...');
     const pdfBuffer = await new Promise((resolve, reject) => {
       const options = {
         format: 'A4',
@@ -41,41 +41,41 @@ exports.generateCertificate = async (data) => {
 
       pdf.create(html, options).toBuffer((err, buffer) => {
         if (err) {
-          console.error('❌ PDF creation failed:', err.message);
+          console.error(' PDF creation failed:', err.message);
           reject(err);
         } else {
-          console.log(`✅ PDF created: ${Math.round(buffer.length / 1024)} KB`);
+          console.log(` PDF created: ${Math.round(buffer.length / 1024)} KB`);
           resolve(buffer);
         }
       });
     });
 
-    // 2. Generate JPG using canvas
-    console.log('📸 Creating JPG with canvas...');
+    // 2. Generating JPG using canvas
+    console.log(' Creating JPG with canvas...');
     let jpgBuffer;
     
     try {
-      // Create canvas (800x600 pixels for preview)
+      // Creating canvas (800x600 pixels for preview)
       const canvas = createCanvas(800, 600);
       const ctx = canvas.getContext('2d');
       
-      // Set background color (white)
+      // Seting up  background color (white)
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       
-      // Add gradient background
+      // Adding gradient background
       const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
       gradient.addColorStop(0, '#f8f9fa');
       gradient.addColorStop(1, '#e9ecef');
       ctx.fillStyle = gradient;
       ctx.fillRect(20, 20, canvas.width - 40, canvas.height - 40);
       
-      // Add border
+      // Adding border
       ctx.strokeStyle = '#2c3e50';
       ctx.lineWidth = 4;
       ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
       
-      // Add inner border
+      // Adding inner border
       ctx.strokeStyle = '#3498db';
       ctx.lineWidth = 2;
       ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
@@ -190,11 +190,11 @@ exports.generateCertificate = async (data) => {
         chromaSubsampling: false
       });
       
-      console.log(`✅ JPG created with canvas: ${Math.round(jpgBuffer.length / 1024)} KB`);
+      console.log(` JPG created with canvas: ${Math.round(jpgBuffer.length / 1024)} KB`);
       
     } catch (jpgError) {
-      console.error('❌ Canvas JPG generation failed:', jpgError.message);
-      console.log('🔄 Creating ASCII art fallback...');
+      console.error(' Canvas JPG generation failed:', jpgError.message);
+      console.log(' Creating ASCII art fallback...');
       
       // Fallback to ASCII art
       const asciiCertificate = `
@@ -206,19 +206,19 @@ exports.generateCertificate = async (data) => {
 ║   │           CERTIFICATE OF REGISTRATION        │   ║
 ║   │              GST Registration                │   ║
 ║   │                                              │   ║
-║   │  📋 Certificate Holder:                      │   ║
+║   │     Certificate Holder:                      │   ║
 ║   │     ${(data.name || '').padEnd(40, ' ')}│   ║
 ║   │                                              │   ║
-║   │  🏢 Business Name:                           │   ║
+║   │     Business Name:                           │   ║
 ║   │     ${(data.businessName || '').padEnd(40, ' ')}│   ║
 ║   │                                              │   ║
-║   │  🔢 GST Number:                              │   ║
+║   │     GST Number:                              │   ║
 ║   │     ${(data.gstNumber || '').padEnd(40, ' ')}│   ║
 ║   │                                              │   ║
-║   │  📍 Business Address:                        │   ║
+║   │     Business Address:                        │   ║
 ║   │     ${(data.businessAddress || '').substring(0, 40).padEnd(40, ' ')}│   ║
 ║   │                                              │   ║
-║   │  📅 Generated: ${new Date().toLocaleDateString().padEnd(30, ' ')}│   ║
+║   │     Generated: ${new Date().toLocaleDateString().padEnd(30, ' ')}│   ║
 ║   └──────────────────────────────────────────────┘   ║
 ║                                                      ║
 ╚══════════════════════════════════════════════════════╝
@@ -227,7 +227,7 @@ exports.generateCertificate = async (data) => {
       jpgBuffer = Buffer.from(asciiCertificate);
     }
 
-    console.log('🎉 Certificate generation complete!');
+    console.log(' Certificate generation complete!');
     return { 
       pdfBuffer, 
       jpgBuffer,
@@ -239,7 +239,7 @@ exports.generateCertificate = async (data) => {
     };
     
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error(' Error:', error.message);
     
     // Simple fallback
     try {
