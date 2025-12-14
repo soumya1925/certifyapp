@@ -172,10 +172,33 @@ npm install canvas                       (Creates JPG preview images of the gene
 npm install @getbrevo/brevo              (Integrates Brevo (SendinBlue) to send certificate emails with attachments.)
 npm install --save-dev nodemon           (Automatically restarts the server during development when code changes.)
 ```
-**or install all at once**
+**Or install all at once**
 ```
 npm install express dotenv html-pdf canvas @getbrevo/brevo
 npm install --save-dev nodemon
 ```
+**Get Brevo API Key**
 
+- Sign up at Brevo.com (free tier available)
+- Go to SMTP & API → API Keys
+- Click "Generate a new API key"
+- Name it "Certificate App" and copy the key (starts with xkeysib-)
+- Add this key to your .env file as BREVO_API_KEY
+
+**Verify Sender Email**
+- In Brevo dashboard, go to Senders & IP → Senders
+- Click "Create a new sender"
+- Add your email address (e.g., monturoul@gmail.com)
+- Click the verification link sent to your email
+- Use this verified email in .env as BREVO_SENDER_EMAIL
+
+**Setting up env variables**
+- Craete a .env file in the root directory as described in the project structure
+- .env must contain the following:
+
+ ```
+# Required: Brevo Email Service
+BREVO_API_KEY=your_brevo_api_key_here
+BREVO_SENDER_EMAIL=your_verified_email@gmail.com
+```
 
