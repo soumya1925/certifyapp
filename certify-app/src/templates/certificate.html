@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <style type='text/css'>
+            body, html {
+                margin: 0;
+                padding: 0;
+            }
+            body {
+                color: black;
+                
+                display: table; 
+                font-family: Georgia, serif;
+                font-size: 20px; 
+                text-align: center;
+                width: 100%;
+                height: 100vh; 
+            }
+            .container {
+                border: 20px solid tan;
+                width: 750px;
+                height: 563px;
+                display: table-cell;
+                vertical-align: middle; 
+                padding: 20px; 
+                margin: auto; 
+            }
+            .logo {
+                color: tan;
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .marquee {
+                color: tan;
+                font-size: 40px; 
+                margin: 20px 0;
+            }
+            
+           
+            .registration-data-container {
+                margin: 40px auto;
+                width: 80%; 
+                text-align: left; 
+                line-height: 1.6;
+            }
+            .data-field {
+                margin: 15px 0;
+            }
+           
+            .data-value {
+                border-bottom: 2px solid black; 
+                font-size: 24px; 
+                font-style: italic;
+                padding: 0 5px;
+                color: #555; 
+            }
+            .footer-note {
+                margin-top: 40px;
+                font-size: 16px;
+                color: #888;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+          
+
+            <div class="marquee">
+                Certificate of Registration
+            </div>
+            
+            <div class="registration-data-container">
+                <div class="data-field">
+                    Certificate Holder: 
+                    <b class="data-value">{{name}}</b>
+                </div>
+                <div class="data-field">
+                    Business Name: 
+                    <b class="data-value">{{businessName}}</b>
+                </div>
+                <div class="data-field">
+                    GST Number: 
+                    <b class="data-value">{{gstNumber}}</b>
+                </div>
+                <div class="data-field">
+                    Business Address: 
+                    <b class="data-value">{{businessAddress}}</b>
+                </div>
+            </div>
+
+            <div class="footer-note">
+                This document certifies formal registration as of the issue date.
+            </div>
+        </div>
+    </body>
+</html>
