@@ -9,7 +9,8 @@ A professional GST/Tax Certificate Generation API that creates PDF certificates,
 **Base URL**  
 https://taxcertificate.onrender.com
 
-**API Endpoint**  
+**API Endpoint** 
+
 POST https://taxcertificate.onrender.com/api/generate-certificate
 
 ---
