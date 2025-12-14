@@ -4,7 +4,7 @@ A professional GST/Tax Certificate Generation API that creates PDF certificates,
 
 ---
 
-## Live Demo
+## Live Demo 
 
 **Base URL**  
 https://taxcertificate.onrender.com
@@ -36,21 +36,19 @@ POST https://taxcertificate.onrender.com/api/generate-certificate
 - **Environment Variables:** dotenv
 
 
-## 🛠️ API Usage
+## 🛠️ API Usage /Testing VIA POSTMAN (RECOMMENDED)
 
 ### Generate Certificate
 
 **Endpoint**
 
 ```http
-POST /api/generate-certificate
-Request Headers
-http
-Copy code
+POST https://taxcertificate.onrender.com/api/generate-certificate
+```
+
 Content-Type: application/json
-Request Body
-json
-Copy code
+Request Body :json
+```Raw data:
 {
   "name": "Sam Ranjan",
   "email": "rsoumya150@gmail.com",
@@ -59,25 +57,26 @@ Copy code
   "businessAddress": "Bangalore, Karnataka, India"
 }
 ```
-Successful Response (200 OK)
-json
-Copy code
+**Successful Response (200 OK)**
+```
 {
   "message": "Certificate generated successfully",
   "pdfSize": 17408,
   "jpgSize": 70656,
   "emailStatus": "sent"
 }
-Error Response (400 / 500)
-json
-Copy code
+```
+
+**Error Response (400 / 500)**
+```
 {
   "error": "All fields are required"
 }
-🧪 Testing
-Testing with cURL
+```
+
+**Testing with cURL**
 bash
-Copy code
+```
 curl -X POST https://taxcertificate.onrender.com/api/generate-certificate \
   -H "Content-Type: application/json" \
   -d '{
@@ -87,22 +86,4 @@ curl -X POST https://taxcertificate.onrender.com/api/generate-certificate \
     "businessName": "Deployment",
     "businessAddress": "Bangalore, Karnataka, India"
   }'
-Testing with JavaScript (Fetch API)
-javascript
-Copy code
-fetch('https://taxcertificate.onrender.com/api/generate-certificate', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    name: 'Sam Ranjan',
-    email: 'rsoumya150@gmail.com',
-    gstNumber: '29ABCDE1234F1Z5',
-    businessName: 'Deployment',
-    businessAddress: 'Bangalore, Karnataka, India'
-  })
-})
-  .then(response => response.json())
-  .then(data => console.log(data))
-  .catch(error => console.error('Error:', error));
+```
