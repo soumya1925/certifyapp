@@ -46,7 +46,7 @@ POST https://taxcertificate.onrender.com/api/generate-certificate
 POST https://taxcertificate.onrender.com/api/generate-certificate
 ```
 
-Content-Type: application/json
+Content-Type: application.json
 Request Body :json
 ```Raw data:
 {
