@@ -127,13 +127,8 @@ Brevo (formerly SendinBlue) provides the email delivery infrastructure that allo
 - Trying fallback configuration...
 - Fallback also failed: Connection timeout
 
-**Deployment relates isssues with render while working with   Puppeteer/Chrome Installation**
--❌ Certificate generation failed: Error: Could not find Chrome (ver. 143.0.7499.42)
--This can occur if either:
-  -1. you did not perform an installation before running the script
-  -2. your cache path is incorrectly configured
 
-** Nodemailer (Failed Approach): **
+**Nodemailer (Failed Approach):**
 ```
 // This failed on Render due to network restrictions
 const transporter = nodemailer.createTransport({
@@ -147,8 +142,9 @@ const transporter = nodemailer.createTransport({
 // Result: ❌ Connection timeout every time
 ```
 
-** Brevo (Working Solution): **
-// This works on Render - uses standard HTTPS
+**Brevo (Working Solution):**
+
+This works on Render - uses standard HTTPS
 ```
 const response = await fetch('https://api.brevo.com/v3/smtp/email', {
   method: 'POST',
