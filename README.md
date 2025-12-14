@@ -116,10 +116,10 @@ curl -X POST https://taxcertificate.onrender.com/api/generate-certificate \
 - Git (for version control)
 - Brevo Account (for email service) - Sign up free
 
-** Purpose of Brevo Account**
--Brevo (formerly SendinBlue) provides the email delivery infrastructure that allows your certificate application to send emails with PDF attachments. Without Brevo, your app can generate certificates but cannot deliver them to users.
+**Purpose of Brevo Account**
+ Brevo (formerly SendinBlue) provides the email delivery infrastructure that allows your certificate application to send emails with PDF attachments. Without Brevo, your app can generate certificates but cannot   deliver them to users.
 
-** Issue with nodemailer and Puppeteer  **
+**Issue with nodemailer and Puppeteer**
 - EMAIL SENDING FAILED:  SMTP Connection Timeouts
 - SMTP needs persistent connections
 - Render blocks outgoing SMTP ports (587, 465)
