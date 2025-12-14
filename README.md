@@ -260,7 +260,10 @@ Server running on http://localhost:3000
  ```
 
 ## 📋 Sample Certificate on sucessful response
+- Jpg file
+[📥 Download Sample Certificate jpg](https://drive.google.com/uc?export=download&id=1g44IbEDcQQ49iH2WBK1ylhIwfhoFxhvo)
 
-[📥 Download Sample Certificate PDF](https://drive.google.com/uc?export=download&id=1g44IbEDcQQ49iH2WBK1ylhIwfhoFxhvo)
+## Contact
 
-
+If you encounter any issues with the API or have suggestions for improvements:
+Email: soumyaroul19@gmail.com
